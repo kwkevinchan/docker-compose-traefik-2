@@ -1,0 +1,22 @@
+[api]
+  debug = true
+  dashboard = true
+
+[accessLog]
+
+[entryPoints]
+  [entryPoints.web]
+    address = ":80"
+
+  [entryPoints.ssl]
+    address = ":443"
+
+[providers.docker]
+
+[docker]
+endpoint = "unix:///var/run/docker.sock"
+watch = true
+
+[[tls.certificates]]
+  certFile = "/etc/ssl-keys/local.cert"
+  keyFile = "/etc/ssl-keys/local.key"

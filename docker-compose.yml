@@ -1,0 +1,59 @@
+version: "3.7"
+
+networks:
+  traefik_bridge:
+    name: traefik_bridge
+    driver: bridge
+
+services:
+  traefik:
+    image: traefik
+    ports:
+      - "443:443"
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./traefik.toml:/traefik.toml
+      - ./keys/:/etc/ssl-keys/
+    networks:
+      - traefik_bridge
+    labels:
+      - "traefik.http.routers.api.rule=Host(`traefik.test`)"
+      - "traefik.http.routers.api.service=api@internal"
+    
+### DataBase ###
+  mysql:
+    image: mysql:5.6
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./data/mysql/:/var/lib/mysql
+    networks:
+      - traefik_bridge
+  
+  redis:
+    image: redis:4
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./data/redis/:/data
+    command:
+      - --requirepass ${REDIS_PASSWORD}
+    networks:
+      - traefik_bridge
+
+  mongo:
+    image: mongo:4.2
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+    volumes:
+      - ./data/mongo:/data/db
+    networks:
+      - traefik_bridge
