@@ -8,6 +8,13 @@
   [entryPoints.web]
     address = ":80"
 
+    # [entryPoints.web.http]
+    #     [entryPoints.web.http.redirections]
+    #     [entryPoints.web.http.redirections.entryPoint]
+    #         to = "ssl"
+    #         scheme = "https"
+
+
   [entryPoints.ssl]
     address = ":443"
 
@@ -17,6 +24,6 @@
 endpoint = "unix:///var/run/docker.sock"
 watch = true
 
-[[tls.certificates]]
-  certFile = "/etc/ssl-keys/local.cert"
-  keyFile = "/etc/ssl-keys/local.key"
+# traefik.toml
+[providers.file]
+  directory = "/etc/ssl-keys/"

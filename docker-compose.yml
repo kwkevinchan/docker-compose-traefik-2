@@ -13,14 +13,16 @@ services:
       - "80:80"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./traefik.toml:/traefik.toml
-      - ./keys/:/etc/ssl-keys/
+      - ./traefik.toml:/traefik.toml:cached
+      - ./keys/:/etc/ssl-keys/:cached
     networks:
-      - traefik_bridge
+      traefik_bridge:
+        aliases:
+          - "news.test"
     labels:
       - "traefik.http.routers.api.rule=Host(`traefik.test`)"
       - "traefik.http.routers.api.service=api@internal"
-    
+
 ### DataBase ###
   mysql:
     image: mysql:5.6
@@ -29,7 +31,8 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - ./data/mysql/:/var/lib/mysql
+      - ./data/mysql/:/var/lib/mysql:cached
+      - ./data/mysql-docker.cnf:/etc/mysql/conf.d/mysql-docker.cnf:cached
     networks:
       - traefik_bridge
   
@@ -40,20 +43,20 @@ services:
     ports:
       - "6379:6379"
     volumes:
-      - ./data/redis/:/data
+      - ./data/redis/:/data:cached
     command:
       - --requirepass ${REDIS_PASSWORD}
     networks:
       - traefik_bridge
 
-  mongo:
-    image: mongo:4.2
-    ports:
-      - "27017:27017"
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
-    volumes:
-      - ./data/mongo:/data/db
-    networks:
-      - traefik_bridge
+  # mongo:
+  #   image: mongo:4.2
+  #   ports:
+  #     - "27017:27017"
+  #   environment:
+  #     MONGO_INITDB_ROOT_USERNAME: root
+  #     MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+  #   volumes:
+  #     - ./data/mongo:/data/db:cached
+  #   networks:
+  #     - traefik_bridge

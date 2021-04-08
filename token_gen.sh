@@ -1,1 +1,1 @@
-head /dev/urandom | tr -dc A-Za-z0-9 | head -c 13 ; echo ''
+head /dev/urandom | tr -dc A-Za-z0-9 | head -c 32 ; echo ''
